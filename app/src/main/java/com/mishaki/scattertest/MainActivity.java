@@ -1,5 +1,7 @@
 package com.mishaki.scattertest;
 
+import android.content.ComponentName;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,11 +26,17 @@ public class MainActivity extends AppCompatActivity {
         ScatterUtil.postTag("a");
         //向方法签名为空的方法发送事件
         ScatterUtil.post();
+        ScatterUtil.post("p1","p2");
     }
 
     @Receive
-    public void receiveMethod(String param){
-        Log.v(TAG,"param:" + param);
+    public void receiveMethod(String param) {
+        Log.v(TAG, "param:" + param);
+    }
+
+    @Receive
+    public void receiveMethod2(String param1, String param2) {
+        Log.v(TAG, "param1:" + param1 + ",param2:" + param2);
     }
 
     @Receive(tag = "a")

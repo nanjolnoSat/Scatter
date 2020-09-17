@@ -1,6 +1,7 @@
 package com.mishaki.scatter;
 
-import java.lang.reflect.InvocationTargetException;
+import android.os.Looper;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -48,7 +49,8 @@ public final class Scatter {
 
     /**
      * 注册当前对象
-     * @exception IllegalArgumentException 当receiver里面没有方法有Receive的标签的时候
+     *
+     * @throws IllegalArgumentException 当receiver里面没有方法有Receive的标签的时候
      */
     public synchronized void register(Object receiver) {
         if (eventReceiver.containsKey(receiver)) {
@@ -107,7 +109,8 @@ public final class Scatter {
 
     /**
      * 取消注册当前对象
-     * @exception IllegalArgumentException 当该对象没有注册的时候,抛出该异常
+     *
+     * @throws IllegalArgumentException 当该对象没有注册的时候,抛出该异常
      */
     public synchronized void unregister(Object receiver) {
         if (!eventReceiver.containsKey(receiver)) {
@@ -192,7 +195,11 @@ public final class Scatter {
                     post(mi, args);
                     break;
                 case MAIN:
-                    mainConverter.taskQueue(mi, args);
+                    if (isMainThread()) {
+                        post(mi, args);
+                    } else {
+                        mainConverter.taskQueue(mi, args);
+                    }
                     break;
                 case ASYNC:
                     asyncConverter.taskQueue(mi, args);
@@ -210,16 +217,16 @@ public final class Scatter {
         try {
             Method method = methodInfo.invokeObj.getClass().getMethod(methodInfo.methodName, methodInfo.parameterTypes);
             method.invoke(methodInfo.invokeObj, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private boolean textIsEmpty(String text) {
         return text == null || text.trim().length() == 0;
+    }
+
+    private boolean isMainThread() {
+        return Looper.getMainLooper() == Looper.myLooper();
     }
 }

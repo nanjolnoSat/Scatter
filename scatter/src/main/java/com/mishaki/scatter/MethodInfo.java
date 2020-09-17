@@ -16,7 +16,7 @@ class MethodInfo {
     /**
      * 参数类型
      */
-    Class[] parameterTypes;
+    Class<?>[] parameterTypes;
     ThreadMode threadMode;
     String tag;
 
